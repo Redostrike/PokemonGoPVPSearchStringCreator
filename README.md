@@ -1,9 +1,9 @@
 # Pokemon Go PVP Search String Creator
 Makes search strings based on user input.
 
-Download the CSV files from PVPPoke to import them in this app. Other CSV won't work! PVPPoke does amazing stuff, be sure to support them!
+Download the CSV files from PVPoke to import them in this app. Other CSV won't work! PVPPoke does amazing stuff, be sure to support them!
 
-I am in no form affiliated with PVPPoke this is mainly a tool to be used with the data they make available!
+I am in no form affiliated with PVPoke this is mainly a tool to be used with the data they make available!
 
 After upload you can filter what you want. (i personally use TOP 100).
 
