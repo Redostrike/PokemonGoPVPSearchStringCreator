@@ -15,3 +15,5 @@ You can add your own prefixes the best to use is the &0attack&3-4hp&3-4defense a
 There is also a reverse string lookup. If you past a search string in there it will show what pokémon are being search for by name, can be handy sometimes.
 
 Any questions be sure to ask.
+
+This app is created with AI i don't know how it is coded i just prompt stuff ai makes it and i'm good. Vibe coding man i love it.
