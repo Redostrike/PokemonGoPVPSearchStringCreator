@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Pokémon Go PVP Search</title>
+<link rel="icon" type="image/png" href="icon.png">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <script type='text/javascript' src='https://storage.ko-fi.com/cdn/widget/Widget_2.js'></script>
 <style>
@@ -214,6 +215,16 @@ tbody td{
 .col-pokemon{font-weight:600}
 .col-score{font-weight:700;color:var(--accent)}
 .col-dex{color:var(--text-secondary)}
+.link-icons{display:inline-flex;align-items:center;gap:3px;margin-right:4px}
+.link-icon{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:4px;font-size:0.6rem;font-weight:700;text-decoration:none;transition:all .15s;color:#fff}
+.link-hub{background:#e84142}
+.link-hub:hover{background:#c03536}
+.link-ivs{background:#4a9eff}
+.link-ivs:hover{background:#207de6}
+.link-poke{background:#6b5bff}
+.link-poke:hover{background:#4d3ee0}
+.link-icons-label{font-size:0.65rem;color:var(--text-muted);font-weight:400}
+@media(max-width:768px){.link-icon{width:18px;height:18px;font-size:0.5rem}}
 .type-badge{
   display:inline-block;
   padding:2px 10px;
@@ -492,8 +503,10 @@ tr.expanded .expand-icon{transform:rotate(180deg)}
 
 /* Responsive */
 @media(max-width:768px){
-  .header{padding:0 12px}
-  .header-logo{font-size:0.95rem}
+  .header{padding:0 8px;gap:4px}
+  .header-logo{font-size:0.85rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:40vw}
+  .header-btn{width:36px;height:36px;flex-shrink:0}
+  .header-btn svg{width:16px;height:16px}
   .tabs{overflow-x:auto;padding:0 12px;gap:0}
   .tab{padding:12px 14px;font-size:0.8rem}
   .toolbar{padding:10px 12px;flex-direction:column}
@@ -501,8 +514,9 @@ tr.expanded .expand-icon{transform:rotate(180deg)}
   .toolbar-actions{width:100%;justify-content:stretch}
   .toolbar-actions .btn{flex:1;justify-content:center;padding:0 12px;font-size:0.8rem}
   .table-wrap{padding:0 8px 12px}
-  thead th{padding:10px 12px;font-size:0.7rem}
-  tbody td{padding:10px 12px;font-size:0.85rem}
+  table{min-width:500px}
+  thead th{padding:8px 8px;font-size:0.65rem}
+  tbody td{padding:8px 8px;font-size:0.8rem}
   .detail-inner{padding:12px 12px 12px 36px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
   .modal{margin:8px;max-height:85vh}
   .settings-panel{width:100%;max-width:100%}
@@ -510,8 +524,17 @@ tr.expanded .expand-icon{transform:rotate(180deg)}
   .filter-row select{min-width:90px}
 }
 @media(max-width:480px){
-  .tab{padding:10px 10px;font-size:0.75rem}
+  .header{padding:0 6px;gap:3px}
+  .header-logo{font-size:0.75rem;max-width:35vw}
+  .header-btn{width:32px;height:32px}
+  .header-btn svg{width:14px;height:14px}
+  .header iframe{transform:scale(0.75);transform-origin:right center}
+  .header a[href*="ko-fi"] img{max-height:28px!important}
+  .tab{padding:10px 8px;font-size:0.7rem}
   .btn{height:40px;padding:0 14px;font-size:0.8rem}
+  table{min-width:380px}
+  thead th{padding:6px 6px;font-size:0.6rem}
+  tbody td{padding:6px 6px;font-size:0.75rem}
   .detail-inner{grid-template-columns:1fr 1fr}
   .export-cols{grid-template-columns:1fr 1fr}
 }
@@ -1341,7 +1364,7 @@ function renderTable(rows) {
   thead.innerHTML = '<tr>' + cols.map(c => {
     if (c === '#') return '<th style="width:40px;text-align:center">#</th>';
     return '<th>' + c.replace(' ','&nbsp;') + '</th>';
-  }).join('') + '<th style="width:40px;text-align:center"></th></tr>';
+  }).join('') + '<th style="text-align:center;font-weight:400"><span class="link-icons-label">Links</span></th></tr>';
 
   tbody.innerHTML = rows.map((row, idx) => {
     const expanded = STATE.expandedRow === idx;
@@ -1359,9 +1382,13 @@ function renderTable(rows) {
       return `<td>${val ?? '—'}</td>`;
     }).join('');
 
+    const links = getLinksHTML(row);
     return `<tr class="${expanded?'expanded':''}" onclick="toggleRow(${idx})">
       ${mainCells}
-      <td style="text-align:center;color:var(--text-muted)"><span class="expand-icon">▼</span></td>
+      <td style="text-align:center;white-space:nowrap">
+        ${links}
+        <span class="expand-icon">▼</span>
+      </td>
     </tr>
     <tr class="detail-row${expanded?'':''}"${expanded?'':' style="display:none"'}>
       <td colspan="${cols.length+1}">
@@ -1376,6 +1403,26 @@ function renderTable(rows) {
       </td>
     </tr>`;
   }).join('');
+}
+
+function slugify(name) {
+  return (name || '').toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+function getLinksHTML(row) {
+  const dex = row.Dex;
+  const name = row.Pokemon || '';
+  const cp = row.CP || '';
+  const league = STATE.activeTab;
+  const slug = slugify(name);
+  return '<span class="link-icons" onclick="event.stopPropagation()">' +
+    '<a href="https://db.pokemongohub.net/pokemon/' + dex + '/pvp" target="_blank" class="link-icon link-hub" title="Pokémon Go Hub">GH</a>' +
+    '<a href="https://pvpivs.com/?mon=' + encodeURIComponent(name) + '&r=10&cp=' + cp + '" target="_blank" class="link-icon link-ivs" title="PVPIVs.com">IV</a>' +
+    '<a href="https://pvpoke.com/rankings/all/' + league + '/overall/' + slug + '/" target="_blank" class="link-icon link-poke" title="PVPoke">PK</a>' +
+    '</span>';
 }
 
 function toggleRow(idx) {
