@@ -1415,12 +1415,11 @@ function slugify(name) {
 function getLinksHTML(row) {
   const dex = row.Dex;
   const name = row.Pokemon || '';
-  const cp = row.CP || '';
   const league = STATE.activeTab;
   const slug = slugify(name);
   return '<span class="link-icons" onclick="event.stopPropagation()">' +
     '<a href="https://db.pokemongohub.net/pokemon/' + dex + '/pvp" target="_blank" class="link-icon link-hub" title="Pokémon Go Hub">GH</a>' +
-    '<a href="https://pvpivs.com/?mon=' + encodeURIComponent(name) + '&r=10&cp=' + cp + '" target="_blank" class="link-icon link-ivs" title="PVPIVs.com">IV</a>' +
+    '<a href="https://pvpivs.com/?mon=' + encodeURIComponent(name) + '&r=10&cp=' + league + '" target="_blank" class="link-icon link-ivs" title="PVPIVs.com">IV</a>' +
     '<a href="https://pvpoke.com/rankings/all/' + league + '/overall/' + slug + '/" target="_blank" class="link-icon link-poke" title="PVPoke">PK</a>' +
     '</span>';
 }
