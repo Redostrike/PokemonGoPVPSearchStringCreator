@@ -1405,6 +1405,14 @@ function renderTable(rows) {
   }).join('');
 }
 
+function parseForm(name) {
+  if (!name) return { base: '', form: '', shadow: false };
+  const isShadow = /\(Shadow\)/.test(name);
+  const m = name.match(/^(.+?)\s+\((Galarian|Alolan|Hisuian|Paldean)\)/);
+  if (m) return { base: m[1].trim(), form: m[2], shadow: isShadow };
+  return { base: isShadow ? name.replace(/\s*\(Shadow\)/g,'').trim() : name, form: '', shadow: isShadow };
+}
+
 function slugify(name) {
   return (name || '').toLowerCase()
     .replace(/[^a-z0-9]+/g, ' ')
@@ -1416,11 +1424,23 @@ function getLinksHTML(row) {
   const dex = row.Dex;
   const name = row.Pokemon || '';
   const league = STATE.activeTab;
-  const slug = slugify(name);
+  const { base, form, shadow } = parseForm(name);
+  let hubDex = dex;
+  let pokeSlug = slugify(base);
+  let monParam = base;
+  if (shadow) {
+    hubDex = dex + '-Shadow';
+    pokeSlug = pokeSlug + '_shadow';
+    monParam = base;
+  } else if (form) {
+    hubDex = dex + '-' + form;
+    pokeSlug = slugify(base) + '_' + form.toLowerCase();
+    monParam = base + '_' + form;
+  }
   return '<span class="link-icons" onclick="event.stopPropagation()">' +
-    '<a href="https://db.pokemongohub.net/pokemon/' + dex + '/pvp" target="_blank" class="link-icon link-hub" title="Pokémon Go Hub">GH</a>' +
-    '<a href="https://pvpivs.com/?mon=' + encodeURIComponent(name) + '&r=10&cp=' + league + '" target="_blank" class="link-icon link-ivs" title="PVPIVs.com">IV</a>' +
-    '<a href="https://pvpoke.com/rankings/all/' + league + '/overall/' + slug + '/" target="_blank" class="link-icon link-poke" title="PVPoke">PK</a>' +
+    '<a href="https://db.pokemongohub.net/pokemon/' + hubDex + '/pvp" target="_blank" class="link-icon link-hub" title="Pokémon Go Hub">GH</a>' +
+    '<a href="https://pvpivs.com/?mon=' + encodeURIComponent(monParam) + '&r=10&cp=' + league + '" target="_blank" class="link-icon link-ivs" title="PVPIVs.com">IV</a>' +
+    '<a href="https://pvpoke.com/rankings/all/' + league + '/overall/' + pokeSlug + '/" target="_blank" class="link-icon link-poke" title="PVPoke">PK</a>' +
     '</span>';
 }
 
