@@ -1420,21 +1420,31 @@ function slugify(name) {
     .replace(/\s+/g, '-');
 }
 
+function hubForm(form) {
+  if (form === 'Alolan') return 'Alola';
+  return form;
+}
+
 function getLinksHTML(row) {
   const dex = row.Dex;
   const name = row.Pokemon || '';
   const league = STATE.activeTab;
   const { base, form, shadow } = parseForm(name);
-  let hubDex = dex;
-  let pokeSlug = slugify(base);
+  const baseSlug = slugify(base);
+  let hubDex = '' + dex;
+  let pokeSlug = baseSlug;
   let monParam = base;
-  if (shadow) {
+  if (form && shadow) {
+    hubDex = dex + '-' + hubForm(form) + '_Shadow';
+    pokeSlug = baseSlug + '_' + form.toLowerCase() + '_shadow';
+    monParam = base + '_' + form;
+  } else if (shadow) {
     hubDex = dex + '-Shadow';
-    pokeSlug = pokeSlug + '_shadow';
+    pokeSlug = baseSlug + '_shadow';
     monParam = base;
   } else if (form) {
     hubDex = dex + '-' + form;
-    pokeSlug = slugify(base) + '_' + form.toLowerCase();
+    pokeSlug = baseSlug + '_' + form.toLowerCase();
     monParam = base + '_' + form;
   }
   return '<span class="link-icons" onclick="event.stopPropagation()">' +
